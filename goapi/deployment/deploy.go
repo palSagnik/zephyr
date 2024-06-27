@@ -19,10 +19,10 @@ func GetK8sClient() (*kubernetes.Clientset, error) {
         err         error
     )
 
-    restConfig, err = rest.InClusterConfig()
-    if err != nil {
-        return nil, err
-    }
+    // restConfig, err = rest.InClusterConfig()
+    // if err != nil {
+    //     return nil, err
+    // }
 
     // For now we go for Out-Cluster Config
     home := homedir.HomeDir()
