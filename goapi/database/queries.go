@@ -3,7 +3,7 @@ package database
 import (
 	"context"
 	"crypto/rand"
-	"crypto/sha256"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"log"
@@ -18,8 +18,7 @@ func GenerateRandom() string {
 	buffer := make([]byte, 128)
 	rand.Read(buffer)
 
-	hash := fmt.Sprintf("%x", sha256.Sum256(buffer))
-	return hash
+	return hex.EncodeToString(buffer)
 }
 
 // miscellanous queries

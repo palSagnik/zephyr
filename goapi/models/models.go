@@ -1,10 +1,11 @@
 package models
 
 type User struct {
-	UserID   int    `json:"userid"`
-	Email    string `json:"email" form:"email"`
-	Username string `json:"username" form:"username"`
-	Password string `json:"password" form:"password"`
+	UserID      int    `json:"userid"`
+	Email       string `json:"email" form:"email"`
+	Username    string `json:"username" form:"username"`
+	Password    string `json:"password" form:"password"`
+	ConfirmPass string `json:"confirm" form:"confirm"`
 }
 
 type Instance struct {
