@@ -1,15 +1,13 @@
 package database
 
 import (
-	"context"
-	"database/sql"
 	"fmt"
-	"time"
+	"log"
 
 	_ "github.com/lib/pq"
 	"github.com/palSagnik/zephyr/config"
-	"gorm.io/gorm"
 	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 var (
@@ -24,13 +22,6 @@ func ConnectDB() error {
 	if err != nil {
 		return err
 	}
-
-	DB.SetMaxOpenConns(30)
-	DB.SetMaxIdleConns(30)
-
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	err = DB.PingContext(ctx)
-	return err
+	log.Printf("Connected To Database: %s\n", config.DB_NAME)
+	return nil
 }

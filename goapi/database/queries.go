@@ -5,12 +5,12 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"errors"
-	"fmt"
 	"log"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/palSagnik/zephyr/models"
+	"gorm.io/gorm"
 )
 
 // Random string generator for instance passwords
@@ -27,40 +27,68 @@ func VerifyCreds(c *fiber.Ctx) error {
 	return nil
 }
 
-func DoesEmailExist(email string) bool {
-	var uid int
-	if err := DB.QueryRow(`SELECT userid FROM users WHERE email = $1`, email).Scan(&uid); err == nil {
-		return true
+func doesEmailExist(user *models.User, email string) (bool, error) {
+	
+	result := DB.Where("email = ?", email).First(&user)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+
+			// Record not found
+			return false, nil
+		}
+		// Other error
+		return false, result.Error
 	}
-	return false
+	
+	return true, nil
 }
 
 // user related queries
-func AddUser(c *fiber.Ctx, email string) (string, error) {
-	ctx, cancel := context.WithTimeout(c.Context(), 15*time.Second)
-	defer cancel()
-
-	userData := new(models.User)
-
-	// checking if the email already exists
-	if DoesEmailExist(email) {
-		return "user already exists", errors.New("user exists")
+func DeleteUser(c *fiber.Ctx) error {
+	
+	email := c.Params("email")
+	result := DB.Delete(&email)
+	if result.Error != nil {
+		return result.Error
 	}
-
-	if _, err := DB.QueryContext(ctx, `INSERT INTO users (username, email, password) VALUES ($1, $2, $3)`, userData.Username, userData.Email, userData.Password); err != nil {
-		log.Println(err.Error())
-		return "user could not be added", err
-	}
-
-	return "user added successfully", nil
+	
+	return nil
 }
 
-func DoesUserExist(c *fiber.Ctx, userid int) bool {
-	var username int
-	ctx, cancel := context.WithTimeout(c.Context(), 15*time.Second)
-	defer cancel()
+func AddUser(c *fiber.Ctx) error {
 
-	if err := DB.QueryRowContext(ctx, `SELECT username FROM users WHERE userid = $1`, userid).Scan(&username); err != nil {
+	userData := new(models.User)
+	userData.Email = c.Params("email")
+	userData.Username = c.Params("username")
+	userData.Password = c.Params("password")
+
+	// checking if the email already exists
+	found, err := (doesEmailExist(userData, userData.Email))
+	if found {
+		return errors.New("email already exists")
+	} 
+	if err != nil {
+		return err
+	}
+
+	result := DB.Create(&userData)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	// TODO: After creating user delete from toverify table
+
+	return nil
+	
+}
+
+func DoesUserExist(c *fiber.Ctx) bool {
+	userid := c.Params("userid")
+
+	user := new(models.User)
+	result := DB.Find(&user, userid)
+
+	if result.RowsAffected == 0 {
 		return false
 	}
 	return true
@@ -68,6 +96,16 @@ func DoesUserExist(c *fiber.Ctx, userid int) bool {
 
 
 // Instance related queries
+func GetAllRunningInstances(c *fiber.Ctx) error {
+	var instances []models.RunningInstance
+
+	if result := DB.Find(&instances); result.Error != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"status":"failure", "message":"no instances found"})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(instances)
+}
+
 func CanStartInstance(c *fiber.Ctx, userid int) bool {
 	var runid int	
 	ctx, cancel := context.WithTimeout(c.Context(), 15*time.Second)
@@ -85,15 +123,6 @@ func CanStartInstance(c *fiber.Ctx, userid int) bool {
 	return true
 }
 
-func DeleteRunningInstance(c *fiber.Ctx, userid int) error {
-	ctx, cancel := context.WithTimeout(c.Context(), 15*time.Second)
-	defer cancel()
 
-	if _, err := DB.QueryContext(ctx, `DELETE FROM running WHERE userid = $1`, userid); err != nil {
-		return err
-	}
-
-	return nil
-}
 
 

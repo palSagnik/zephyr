@@ -1,38 +1,22 @@
 package database
 
 import (
-	"context"
-	"log"
-	"time"
+	"github.com/palSagnik/zephyr/models"
 )
 
-func CreateTables() error {
+func MigrateUp() error {
 	var err error
-
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
-	defer cancel()
-
-	_, err = DB.QueryContext(ctx, `
-	CREATE TABLE IF NOT EXISTS users(
-		userid bigserial PRIMARY KEY,
-		email text NOT NULL UNIQUE,
-		username text NOT NULL UNIQUE,
-		password VARCHAR(100) NOT NULL,
-	)`)
-	if err != nil {
-		log.Println(err)
-		return err
-	}
-
-	_, err = DB.QueryContext(ctx, `
-	CREATE TABLE IF NOT EXISTS running(
-		runid bigserial PRIMARY KEY,
-		userid bigint NOT NULL REFERENCES users(userid),
-		`)
-	if err != nil {
-		log.Println(err)
-		return err
-	}
 	
+	// struct pointers
+	users := new(models.User)
+	configs := new(models.CustomConfigurations)
+	runningInstances := new(models.RunningInstance)
+	verification := new(models.Verification)
+
+	// creating tables
+	err = DB.AutoMigrate(users, configs, runningInstances, verification)
+	if err != nil {
+		return err
+	}
 	return nil
 }
