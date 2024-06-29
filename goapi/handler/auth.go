@@ -31,8 +31,8 @@ func Signup(c *fiber.Ctx) error{
 
 	signupForm.Email = strings.ToLower(signupForm.Email)
 
-	if isOk, statusCode := utils.VerifySignUpInput(signupForm); isOk != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"status":"failed", "message":statusCode})
+	if isOk, statusMsg := utils.VerifySignUpInput(signupForm); !isOk {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"status":"failed", "message":statusMsg})
 	}
 
 	// send verification mail
