@@ -1,3 +1,6 @@
-*.txt
-*.logs
-*.json
+tasks.txt
+
+goapi/logs/error.log
+goapi/.env
+
+.DS_Store
