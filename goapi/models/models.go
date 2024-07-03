@@ -25,7 +25,7 @@ type CustomConfigurations struct {
 type RunningInstance struct {
 	RunID       int `json:"runid"   gorm:"column:runid;primaryKey;autoIncrement"`
 	UserID      int `               gorm:"column:userid;foreignKey:users.userid"`
-	ConfigArray []int
+	ConfigArray []int64 `           gorm:"column:configid_arr;type:integer[]"`
 }
 
 // toverify --> vid, username, email, password, timestamp

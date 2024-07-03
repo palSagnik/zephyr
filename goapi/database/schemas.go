@@ -15,7 +15,7 @@ var (
 func MigrateUp() error {
 
 	// creating tables
-	err := DB.AutoMigrate(users, configs, verification)
+	err := DB.AutoMigrate(users, configs, verification, runningInstances)
 	if err != nil {
 		return err
 	}
