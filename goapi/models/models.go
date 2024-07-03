@@ -2,8 +2,6 @@ package models
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 // used for tables
@@ -32,8 +30,6 @@ type RunningInstance struct {
 
 // toverify --> vid, username, email, password, timestamp
 type Verification struct {
-	gorm.Model `json:"-"`
-
 	VerificationID int       `json:"vid"                        gorm:"column:vid;primaryKey;autoIncrement"`
 	Email          string    `json:"email"    form:"email"      gorm:"unique;not null"`
 	Username       string    `json:"username" form:"username"   gorm:"unique;not null"`

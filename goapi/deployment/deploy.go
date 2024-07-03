@@ -40,4 +40,3 @@ func GetK8sClient() (*kubernetes.Clientset, error) {
 
     return clientset, nil
 }
-

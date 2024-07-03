@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 
 	_ "github.com/joho/godotenv/autoload"
@@ -11,3 +12,5 @@ var SESSION_EXPIRY = 72
 var MAIL_LEN = 320
 var PASS_LEN = 32
 var USERNAME_LEN = 24
+
+var APP_PORT = fmt.Sprintf(":%s", os.Getenv("APP_PORT"))

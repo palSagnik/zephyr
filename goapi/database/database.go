@@ -22,6 +22,7 @@ func ConnectDB() error {
 	if err != nil {
 		return err
 	}
+	
 	log.Printf("Connected To Database: %s\n", config.DB_NAME)
 	return nil
 }

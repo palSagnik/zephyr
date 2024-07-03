@@ -83,7 +83,7 @@ func Login(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"status": "failure", "message": "invalid credentials"})
 	}
 
-	// TODO: token generation and assigning
+	// token generation and assigning
 	token, err := middleware.GenerateToken(user)
 	if err != nil {
 		log.Println(err)

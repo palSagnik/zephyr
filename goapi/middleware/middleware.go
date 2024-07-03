@@ -11,7 +11,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func VerifyToken(c string) fiber.Handler {
+func VerifyToken() fiber.Handler {
 	return jwtware.New(jwtware.Config{
 		SigningKey: jwtware.SigningKey{
 			Key: []byte(config.SESSION_SECRET),

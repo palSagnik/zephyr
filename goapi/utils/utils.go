@@ -24,7 +24,7 @@ func UpdateKey(key string) error {
 func GenerateHash(secret string) string {
 	hash := sha256.New()
 	hash.Write([]byte(secret))
-	return string(hash.Sum(nil))
+	return fmt.Sprintf("%x", hash.Sum(nil))
 }
 
 func VerifyLoginInput(creds *models.Credentials) (bool, string) {
@@ -41,7 +41,6 @@ func VerifyLoginInput(creds *models.Credentials) (bool, string) {
 	if _, err := mail.ParseAddress(creds.Email); err != nil {
 		return false, "Not a valid email address"
 	}
-
 	return true, ""
 }
 
@@ -78,6 +77,6 @@ func VerifySignUpInput(signupForm *models.User) (bool, string) {
 }
 
 func SendVerificationMail(signsignupForm *models.User) error {
-	log.Println("verificattion email sent")
+	log.Println("verification email sent")
 	return nil
 }

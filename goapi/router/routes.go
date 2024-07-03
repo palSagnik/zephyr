@@ -3,6 +3,7 @@ package router
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/palSagnik/zephyr/handler"
+	"github.com/palSagnik/zephyr/middleware"
 )
 
 func SetUpRoutes (app *fiber.App) {
@@ -10,10 +11,10 @@ func SetUpRoutes (app *fiber.App) {
 
 	auth := app.Group("/auth")
 	auth.Post("/signup", handler.Signup)
-	auth.Get("/login", handler.Login)
+	auth.Post("/login", handler.Login)
 
-	// api := app.Group("api", middleware.VerifyToken)
-	// api.Post("/configuration", handler.ConfigList)
+	api := app.Group("api", middleware.VerifyToken())
+	api.Post("/configurations", handler.ConfigList)
 	// api.Get("/instance", handler.StartInstance)
 
 }

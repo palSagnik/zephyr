@@ -86,7 +86,11 @@ func AddUser(c *fiber.Ctx, user *models.User) error {
 		return result.Error
 	}
 
-	// TODO: After creating user delete from toverify table
+	// After creating user delete from toverify table
+	result = DB.Delete(&models.Verification{}, "email = ?", user.Email)
+	if result.Error != nil {
+		return result.Error
+	}
 
 	return nil
 }
