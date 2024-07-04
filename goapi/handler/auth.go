@@ -94,7 +94,7 @@ func Login(c *fiber.Ctx) error {
 	}
 
 	cookie := new(fiber.Cookie)
-	cookie.Name = "jwt-token"
+	cookie.Name = "token"
 	cookie.Value = token
 	cookie.SameSite = fiber.CookieSameSiteStrictMode
 	cookie.Expires = time.Now().Add(72 * time.Hour)
@@ -104,9 +104,9 @@ func Login(c *fiber.Ctx) error {
 }
 
 func Verify (c *fiber.Ctx) error {
-	token := c.Query("jwt-token")
+	token := c.Query("token")
 	if token == "" {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"status": "failure", "message": "required to signup again"})
+		return c.Status(fiber.StatusBadRequest).SendString("missing token! Register again")
 	}
 
 	claims := new(models.VerifyClaims)
@@ -123,7 +123,7 @@ func Verify (c *fiber.Ctx) error {
 	}
 
 	if claims.Email == "" {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"status": "failure", "message": "required to signup again"})
+		return c.Status(fiber.StatusBadRequest).SendString("error in token, register again!")
 	}
 	
 	if msg, err := database.AddUser(c, claims.Email); err != nil {

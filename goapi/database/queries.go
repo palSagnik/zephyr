@@ -84,14 +84,14 @@ func AddUser(c *fiber.Ctx, email string) (string, error) {
 	}
 
 	// Get user from toverify table
-	var user models.User
-	result := DB.Select("username, email, password").Where("email = ?", email).First(&user)
+	var toverify models.Verification
+	result := DB.Select("username, email, password").Where("email = ?", email).First(&toverify)
 	if result.Error != nil {
 		return "token expired, please register again", result.Error
 	}
 
 	// Create user
-	result = DB.Create(&models.User{Username: user.Username, Email: user.Email, Password: user.Password})
+	result = DB.Create(&models.User{Username: toverify.Username, Email: toverify.Email, Password: toverify.Password})
 	if result.Error != nil {
 		return "error in creating user, please contact admin", result.Error
 	}
@@ -138,7 +138,7 @@ func CanStartInstance(c *fiber.Ctx, userid int) bool {
 	return true
 }
 
-func DeleteRunning (c *fiber.Ctx, userid int) error {
+func DeleteRunning(c *fiber.Ctx, userid int) error {
 	result := DB.Delete(&models.RunningInstance{}, "userid = ?", userid)
 	if result.Error != nil {
 		return result.Error
