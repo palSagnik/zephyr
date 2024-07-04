@@ -40,7 +40,6 @@ nav {
 nav a, nav span {
   @apply 
 
-  justify-end
   text-gray-500;
 }
 nav a:hover {
