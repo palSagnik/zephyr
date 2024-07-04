@@ -1,11 +1,14 @@
 package handler
 
 import (
+	"errors"
 	"log"
 	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/palSagnik/zephyr/config"
 	"github.com/palSagnik/zephyr/database"
 	"github.com/palSagnik/zephyr/middleware"
 	"github.com/palSagnik/zephyr/models"
@@ -98,4 +101,35 @@ func Login(c *fiber.Ctx) error {
 
 	c.Cookie(cookie)
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": "success", "message": "login successful"})
+}
+
+func Verify (c *fiber.Ctx) error {
+	token := c.Query("jwt-token")
+	if token == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"status": "failure", "message": "required to signup again"})
+	}
+
+	claims := new(models.VerifyClaims)
+	_, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, errors.New("different signing method for token")
+		}
+
+		return []byte(config.TOKEN_SECRET), nil
+	})
+	
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+	}
+
+	if claims.Email == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"status": "failure", "message": "required to signup again"})
+	}
+	
+	if msg, err := database.AddUser(c, claims.Email); err != nil {
+		log.Println(err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"status":"failure", "message":msg})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": "success", "message": "user added! proceed to login"})
 }

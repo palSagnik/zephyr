@@ -2,6 +2,8 @@ package models
 
 import (
 	"time"
+
+	"github.com/golang-jwt/jwt/v5"
 )
 
 // used for tables
@@ -23,9 +25,10 @@ type CustomConfigurations struct {
 
 // running instance --> runid, userid, password, configId array
 type RunningInstance struct {
-	RunID       int `json:"runid"   gorm:"column:runid;primaryKey;autoIncrement"`
-	UserID      int `               gorm:"column:userid;foreignKey:users.userid"`
-	ConfigArray []int64 `           gorm:"column:configid_arr;type:integer[]"`
+	RunID       int       `json:"runid"   gorm:"column:runid;primaryKey;autoIncrement"`
+	UserID      int       `               gorm:"column:userid;foreignKey:users.userid"`
+	ConfigArray []int64   `               gorm:"column:configid_arr;type:integer[]"`
+	CreatedAt   time.Time `               gorm:"column:created_at;index"`
 }
 
 // toverify --> vid, username, email, password, timestamp
@@ -54,4 +57,9 @@ type Credentials struct {
 type ContainerConfig struct {
 	Image      string   `json:"image"`
 	Dependency []string `json:"dependency"`
+}
+
+type VerifyClaims struct {
+	jwt.RegisteredClaims
+	Email string  `json:"email"`
 }

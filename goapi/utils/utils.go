@@ -3,9 +3,9 @@ package utils
 import (
 	"crypto/sha256"
 	"fmt"
-	"log"
-	"os"
 	"net/mail"
+	"os"
+	"unicode"
 
 	"github.com/palSagnik/zephyr/config"
 	"github.com/palSagnik/zephyr/database"
@@ -71,12 +71,43 @@ func VerifySignUpInput(signupForm *models.User) (bool, string) {
 	}
 
 	// TODO: verify password regex
-	
-	return true, ""
-	
+	if msg, isOk := verifyRegex(signupForm.Password); !isOk {
+		return false, msg
+	}
+	return true, ""	
 }
 
-func SendVerificationMail(signsignupForm *models.User) error {
-	log.Println("verification email sent")
-	return nil
+func verifyRegex(password string) (string, bool) {
+	var (
+		checkNum bool
+		checkUpper bool
+		checkSpecial bool
+	)
+
+	for _, char := range password {
+		switch {
+		case unicode.IsNumber(char):
+			checkNum = true
+		case unicode.IsUpper(char):
+			checkUpper = true
+		case unicode.IsPunct(char) || unicode.IsSymbol(char):
+			checkSpecial = true
+		default:
+			checkNum = false
+			checkUpper = false
+			checkSpecial = false
+		}
+	}
+	
+	if !checkNum {
+		return "Password should contain atleast one number", false
+	}
+	if !checkUpper {
+		return "Password should contain atleast one uppercase letter", false
+	}
+	if !checkSpecial {
+		return "Password should contain atleast one special character", false
+	}
+
+	return "", true
 }

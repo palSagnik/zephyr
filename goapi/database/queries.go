@@ -6,8 +6,9 @@ import (
 	"errors"
 	"log"
 
-	"github.com/gofiber/fiber/v2"
 	"github.com/palSagnik/zephyr/models"
+
+	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
 
@@ -30,7 +31,8 @@ func ValidateCreds(c *fiber.Ctx, creds *models.Credentials) error {
 	return nil
 }
 
-func doesEmailExist(user *models.User, email string) (bool, error) {
+func doesEmailExist(email string) (bool, error) {
+	user := new(models.User)
 	result := DB.Where("email = ?", email).First(&user)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
@@ -70,29 +72,34 @@ func DeleteUser(c *fiber.Ctx) error {
 	return nil
 }
 
-func AddUser(c *fiber.Ctx, user *models.User) error {
+func AddUser(c *fiber.Ctx, email string) (string, error) {
 	
 	// checking if the email already exists
-	found, err := (doesEmailExist(user, user.Email))
+	found, err := (doesEmailExist(email))
 	if found {
-		return errors.New("email already exists")
+		return "user already exists", errors.New("token already verified")
 	}
 	if err != nil {
-		return err
+		return err.Error(), err
 	}
 
-	result := DB.Create(&models.User{Username: user.Username, Email: user.Email, Password: user.Password})
+	// Get user from toverify table
+	var user models.User
+	result := DB.Select("username, email, password").Where("email = ?", email).First(&user)
 	if result.Error != nil {
-		return result.Error
+		return "token expired, please register again", result.Error
+	}
+
+	// Create user
+	result = DB.Create(&models.User{Username: user.Username, Email: user.Email, Password: user.Password})
+	if result.Error != nil {
+		return "error in creating user, please contact admin", result.Error
 	}
 
 	// After creating user delete from toverify table
-	result = DB.Delete(&models.Verification{}, "email = ?", user.Email)
-	if result.Error != nil {
-		return result.Error
-	}
+	_ = DB.Delete(&models.Verification{}, "email = ?", email)
 
-	return nil
+	return "", nil
 }
 
 func DoesUserExist(c *fiber.Ctx) bool {
