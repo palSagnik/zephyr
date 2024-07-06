@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: postgred-db
+  name: postgres-db
   labels:
     app: database
 spec:
@@ -17,7 +17,7 @@ spec:
         app: database
     spec:
       containers:
-      - name: postgres-db
+      - name: postgres-database
         image: postgres
         imagePullPolicy: Always
         resources:
@@ -29,18 +29,18 @@ spec:
             memory: "64Mi"
         env:
           - name: POSTGRES_PASSWORD
-                valueFrom:
-                  secretKeyRef:
-                    name: app-secrets
-                    key: db_password
+            valueFrom:
+              secretKeyRef:
+                name: app-secrets
+                key: db_password
           - name: PGUSER
-                valueFrom:
-                  secretKeyRef:
-                    name: app-secrets
-                    key: db_user
+            valueFrom:
+              secretKeyRef:
+                name: app-secrets
+                key: db_user
         ports:
           - name: db-container
-          containerPort: 5432
+            containerPort: 5432
         volumeMounts:
               - name: db-pv
                 mountPath: /var/lib/postgresql/data
@@ -48,7 +48,7 @@ spec:
       volumes:
         - name: db-pv
           persistentVolumeClaim:
-            claimName: db-pv-claim
+            claimName: db-pvc
 
 ---
 apiVersion: v1
