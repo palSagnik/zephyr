@@ -1,0 +1,53 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: goapi-deployment
+  labels:
+    app: goapi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: goapi
+  template:
+    metadata:
+      name: goapi-deployment
+      labels:
+        app: goapi
+    spec:
+      containers:
+        - name: goapi
+          image: docker.io/s4ych33se/zephyr-goapi
+          imagePullPolicy: Always
+          resources:
+            limits:
+              cpu: "300m"
+              memory: "128Mi"
+            requests:
+              cpu: "100m"
+              memory: "64Mi"
+          ports:
+            - containerPort: 80
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: db_password
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: db_user
+            - name: POSTGRES_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: db_host
+            - name: POSTGRES_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: db_name
+
