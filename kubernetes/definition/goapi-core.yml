@@ -50,4 +50,61 @@ spec:
                 secretKeyRef:
                   name: app-secrets
                   key: db_name
+            - name: TOKEN_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: token_secret
+            - name: SESSION_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: session_secret
+            - name: EMAIL_AUTH
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: email_auth
+            - name: CPU_LIMIT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: cpu_limit
+            - name: CPU_REQUEST
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: cpu_request
+            - name: MEMORY_LIMIT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: memory_limit
+            - name: MEMORY_REQUEST
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: memory_request
+            - name: DISK_LIMIT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: disk_limit
+            - name: DISK_REQUEST
+              valueFrom:  
+                configMapKeyRef:
+                  name: app-config
+                  key: disk_request
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: goapi-svc
+  labels:
+    app: goapi-svc
+spec:
+  ports:
+    - port: 80
+  selector:
+    app: goapi
 
