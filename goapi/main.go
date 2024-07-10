@@ -39,6 +39,11 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// Setting up log directory
+	if _, err := os.Stat("./logs"); os.IsNotExist(err) {
+		os.Mkdir("./logs", 0666)
+	}
+	
 	// Setting up logger files
 	errorLogFile, err := os.OpenFile("./logs/error.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
