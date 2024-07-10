@@ -14,4 +14,6 @@ data:
   memory_request: "32Mi"
   disk_limit: "1Gi"
   disk_request: "128Mi"
+  ui_url: "ui-svc"
   api_url: "goapi-svc"
+  proxy_server_name: "unixit.fun isolet.unixit.fun"
